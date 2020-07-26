@@ -1,12 +1,16 @@
 import React from "react";
 import styled from "styled-components";
 
-const ItemWrapper = styled.div`
+const ItemWrapper = styled.button`
   display: flex;
   width: 500px;
   padding: 10px 0;
   justify-content: space-between;
+  border: none;
   border-bottom: 1px solid grey;
+  background: transparent;
+  color:white;
+  cursor: pointer;
 `;
 
 const Name = styled.p`
@@ -25,7 +29,7 @@ const NumOwned = styled.p`
 
 const Item = ({ item: { name, cost, value }, numOwned, handleClick }) => {
   return (
-    <ItemWrapper>
+    <ItemWrapper onClick={handleClick}>
       <Name>{name}</Name>
       <Description>
         Cost: {cost} cookies. Produces {value} cookie(s)/second

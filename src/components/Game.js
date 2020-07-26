@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import Item from './Item';
+import Item from "./Item";
 import cookieSrc from "../cookie.svg";
-import { useState } from 'react';
-import useInterval from '../hooks/use-interval.hook'
+import { useState, useEffect } from "react";
+import useInterval from "../hooks/use-interval.hook";
 
 const items = [
   { id: "cursor", name: "Cursor", cost: 10, value: 1 },
@@ -14,12 +14,41 @@ const items = [
 
 const Game = () => {
   // TODO: Replace this with React state!
-  const [cookie, setCookie] = useState(100)
+  const [cookie, prevValue] = useState(100);
+
+  useEffect(() => {
+    document.title = `${cookie} cookies - Cookie Clicker`
+  }, [cookie])
+
   const [purchasedItems, setPurchasedItems] = useState({
     cursor: 0,
     grandma: 0,
     farm: 0,
   });
+
+  const handleClick = (item) => {
+    if (cookie >= item.cost) {
+      prevValue(cookie - item.cost);
+      setPurchasedItems({
+        ...purchasedItems,
+        [item.id]: purchasedItems[item.id] + 1,
+      });
+    } else window.alert("This it not enough cookies!!");
+  }
+  
+  const calculateCookiesPerTick = (purchasedItems) => {
+    return (
+      purchasedItems.cursor +
+      purchasedItems.grandma * 10 +
+      purchasedItems.farm * 80
+      );
+    };
+
+  useInterval(() => {
+    const numberOfCookies = calculateCookiesPerTick(purchasedItems);
+    prevValue((prevVal) => prevVal + numberOfCookies);
+    console.log(numberOfCookies)
+  }, 1000);
 
   return (
     <Wrapper>
@@ -27,30 +56,26 @@ const Game = () => {
         <Indicator>
           <Total>{cookie} cookies</Total>
           {/* TODO: Calcuate the cookies per second and show it here: */}
-          <strong>0</strong> cookies per second
+          <strong>
+            {calculateCookiesPerTick(purchasedItems)}
+          </strong>{" "}
         </Indicator>
         <Button>
-          <Cookie src={cookieSrc} onClick={() => setCookie(cookie + 1)} />
+          <Cookie src={cookieSrc} onClick={() => prevValue(cookie + 1)} />
         </Button>
       </GameArea>
 
       <ItemArea>
         <SectionTitle>Items:</SectionTitle>
         {/* TODO: Add <Item> instances here, 1 for each item type. */}
-       {items.map((item) => 
-        <Item 
-          key={item.id} 
-          item = {item}
-          numOwned={purchasedItems[item.id]} 
-          handleClick={() => {
-            if (cookie >= item.cost) {
-              setCookie(cookie - item.cost);
-              setPurchasedItems({
-                ...purchasedItems, [item.id]: purchasedItems[item.id] + 1})
-            } else window.alert('This it not enough cookies!!');
-          }}
-        /> ) 
-      }
+        {items.map((item) => (
+          <Item
+            key={item.id}
+            item={item}
+            numOwned={purchasedItems[item.id]}
+            handleClick={() => handleClick(item)}    
+            />
+        ))}
       </ItemArea>
       <HomeLink to="/">Return home</HomeLink>
     </Wrapper>
