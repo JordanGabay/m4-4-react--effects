@@ -20,6 +20,18 @@ const Game = () => {
     document.title = `${cookie} cookies - Cookie Clicker`
   }, [cookie])
 
+  useEffect(() => {
+    const handleKeydown = (ev) => {
+      if (ev.code === "Space") {
+        prevValue(cookie + 1);
+      }
+    };
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, [cookie]);
+
   const [purchasedItems, setPurchasedItems] = useState({
     cursor: 0,
     grandma: 0,
